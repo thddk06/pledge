@@ -1,633 +1,421 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<base target="_top">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>관상 수사대: 롬브로소의 몽타주</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFC 키링 다짐 카드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Gothic+Coding:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root{--paper:#efebe2;--paper2:#e6e0d3;--ink:#232220;--muted:#6d685e;--red:#b3261e;--blue:#1f4e8c;--line:#cfc7b6;--card:#f7f4ee;--green:#2e7d32}
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
-  body{min-height:100vh;background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px),radial-gradient(rgba(0,0,0,.025) 1px,transparent 1px);
-    background-size:7px 7px,11px 11px;background-position:0 0,3px 5px}
-  .wrap{max-width:820px;margin:0 auto;padding:22px 16px 60px}
-  body.host .wrap{max-width:1180px}
-  .mono{font-family:'Nanum Gothic Coding',monospace}
-  .tag{display:inline-block;font-family:'Nanum Gothic Coding',monospace;font-size:13px;letter-spacing:.06em;border:1.5px solid var(--ink);padding:3px 9px;border-radius:2px;white-space:nowrap}
-  .tag.red{border-color:var(--red);color:var(--red);font-weight:700}
-  h1{font-family:'Black Han Sans',sans-serif;font-weight:400;font-size:clamp(36px,8vw,58px);line-height:1.05;margin:12px 0 6px}
-  h1 em{font-style:normal;color:var(--red)}
-  h2{font-family:'Black Han Sans',sans-serif;font-weight:400;font-size:clamp(24px,5vw,34px);margin:6px 0 10px;line-height:1.2}
-  .sub{color:var(--muted);font-size:15px;line-height:1.6}
-  .panel{background:var(--card);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:18px;margin:16px 0}
-  label.f{display:block;font-family:'Nanum Gothic Coding',monospace;font-size:13px;font-weight:700;margin:10px 0 5px}
-  input.in{width:100%;font:inherit;font-size:20px;padding:12px;border:2px solid var(--ink);background:#fff;border-radius:2px;color:var(--ink)}
-  input.in.code{font-family:'Nanum Gothic Coding',monospace;font-weight:700;letter-spacing:.3em;text-align:center;font-size:28px}
-  input.in:focus{outline:3px solid rgba(179,38,30,.35);outline-offset:2px}
-  .btn{appearance:none;border:2px solid var(--ink);background:var(--ink);color:var(--paper);font:inherit;font-weight:700;font-size:18px;padding:14px 22px;cursor:pointer;border-radius:2px}
-  .btn:active{transform:translateY(2px)}
-  .btn[disabled]{opacity:.35;cursor:default}
-  .btn.ghost{background:transparent;color:var(--ink)}
-  .btn.red{background:var(--red);border-color:var(--red)}
-  .btn.block{width:100%;margin-top:14px}
-  .linkbtn{background:none;border:none;color:var(--muted);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
-  .err{color:var(--red);font-weight:700;font-size:14px;min-height:20px;margin-top:8px}
-  .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-  .center{text-align:center}
+  :root{
+    --bg:#f5f3ee; --paper:#fffdf8; --ink:#1d1d1f; --muted:#8a867e; --line:#e4e0d6;
+    --accent:#c4472f; --ok:#2f7d4f; --bad:#c4472f;
+    --sans:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+    --serif:"Noto Serif KR","Apple SD Gothic Neo",serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  main{max-width:440px;margin:0 auto;padding:28px 20px 48px}
   .hidden{display:none!important}
 
-  .checklist ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:10px}
-  .checklist li{font-size:15px;padding-left:22px;position:relative}
-  .checklist li::before{content:"☐";position:absolute;left:0;top:-1px}
+  /* ---------- header ---------- */
+  .eyebrow{font-size:12px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin:0 0 6px}
+  h1{font-family:var(--serif);font-size:26px;line-height:1.3;margin:0 0 6px;font-weight:700}
+  .lead{font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.6}
 
-  /* 진행자 로비 */
-  .lobby{display:grid;grid-template-columns:minmax(260px,1fr) 1.3fr;gap:20px;align-items:start}
-  .bigcode{font-family:'Nanum Gothic Coding',monospace;font-weight:700;font-size:clamp(56px,10vw,96px);letter-spacing:.12em;line-height:1;margin:6px 0 10px}
-  .qr{background:var(--card);padding:10px;display:inline-block;border:2px solid var(--ink)}
-  .qr img,.qr canvas{display:block}
-  .url{font-family:'Nanum Gothic Coding',monospace;font-size:11px;color:var(--muted);word-break:break-all;margin-top:8px}
-  .plist{list-style:none;display:grid;gap:8px;margin:10px 0}
-  .plist li{display:flex;align-items:center;gap:10px;border:1.5px solid var(--ink);background:#fff;padding:10px 12px;font-weight:700;font-size:18px}
-  .plist li.empty{border-style:dashed;color:var(--muted);font-weight:400;font-size:15px;background:transparent}
-  .dot{width:14px;height:14px;border-radius:50%;flex:none;border:1.5px solid var(--ink)}
-  .plist .x{margin-left:auto}
-  .script{border-left:4px solid var(--red);background:rgba(179,38,30,.06);padding:10px 14px;font-size:15px;line-height:1.6;margin:14px 0}
-  .script b{color:var(--red);font-family:'Nanum Gothic Coding',monospace;font-size:12px;display:block;letter-spacing:.06em}
-  table.mini{width:100%;border-collapse:collapse;font-size:14px}
-  table.mini td{padding:5px 4px;border-bottom:1px solid var(--line)}
-  .stats{display:flex;gap:18px;flex-wrap:wrap}
-  .stats div{font-size:13px;color:var(--muted)}
-  .stats b{display:block;font-family:'Black Han Sans',sans-serif;font-weight:400;font-size:28px;color:var(--ink)}
+  /* ---------- form ---------- */
+  label{display:block;font-size:13px;font-weight:500;margin:0 0 8px}
+  .field{margin-bottom:18px}
+  input[type=text],textarea{
+    width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--paper);
+    border:1px solid var(--line);border-radius:12px;padding:13px 14px;outline:none;transition:border-color .15s
+  }
+  textarea{resize:none;min-height:96px;line-height:1.6}
+  input:focus,textarea:focus{border-color:var(--ink)}
+  .count{font-size:12px;color:var(--muted);text-align:right;margin-top:6px}
 
-  /* 라운드 */
-  .topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-  .me{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px}
-  .q{font-size:clamp(19px,4.4vw,28px);font-weight:900;margin:6px 0 12px;line-height:1.35}
-  .q small{display:block;font-size:13px;font-weight:400;color:var(--muted);margin-top:3px}
-  .timer{font-family:'Black Han Sans',sans-serif;font-size:30px;min-width:64px;text-align:center;border:2px solid var(--ink);padding:2px 10px;background:var(--card)}
-  .timer.low{color:var(--red);border-color:var(--red)}
-  body.host .timer{font-size:46px}
-  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  body.host .pair{gap:22px;max-width:600px;margin:0 auto}
-  .card{background:var(--card);border:2px solid var(--ink);position:relative;text-align:left;font:inherit;color:inherit;padding:0;box-shadow:4px 4px 0 var(--ink);overflow:hidden;display:block;width:100%}
-  button.card{cursor:pointer}
-  button.card[disabled]{cursor:default}
-  .card.sel{outline:4px solid var(--red);outline-offset:3px}
-  .card .lbl{display:flex;justify-content:space-between;padding:7px 9px;border-bottom:1.5px solid var(--ink);font-family:'Nanum Gothic Coding',monospace;font-size:13px;font-weight:700;background:var(--paper2)}
-  .card .lbl .big{font-size:16px}
-  .card svg{display:block;width:100%;height:auto}
-  .reveal{padding:9px 11px 11px;border-top:1.5px solid var(--ink)}
-  .crime{font-size:12px;color:var(--muted)}
-  .verdict{font-weight:900;font-size:clamp(15px,3.6vw,20px);white-space:pre-line;line-height:1.25;margin:2px 0 6px}
-  .verdict.free{color:var(--blue)} .verdict.guilty{color:var(--red)}
-  .lmb{font-family:'Nanum Gothic Coding',monospace;font-size:11px;color:var(--muted)}
-  .meter{height:6px;border:1.2px solid var(--ink);margin-top:3px;background:#fff}
-  .meter span{display:block;height:100%;background:var(--ink)}
-  .stamp{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%) rotate(-12deg);font-family:'Black Han Sans',sans-serif;font-size:clamp(20px,5.5vw,36px);
-    padding:3px 10px;border:4px solid currentColor;border-radius:6px;white-space:nowrap;pointer-events:none;background:rgba(247,244,238,.75);opacity:.93;animation:stamp .3s cubic-bezier(.2,1.6,.4,1)}
-  @keyframes stamp{from{transform:translate(-50%,-50%) rotate(-12deg) scale(1.8);opacity:0}}
-  .stamp.free{color:var(--blue)} .stamp.guilty{color:var(--red)}
-  .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;min-height:22px}
-  .chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 7px;border-radius:20px;color:#fff}
-  .bets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
-  .bet{border:2px solid var(--ink);background:#fff;font:inherit;font-weight:900;font-size:18px;padding:10px 0;cursor:pointer;border-radius:2px}
-  .bet small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
-  .bet.on{background:var(--ink);color:var(--paper)} .bet.on small{color:var(--paper)}
-  .wait{margin-top:14px;padding:14px;border:2px dashed var(--ink);text-align:center;font-weight:700;line-height:1.6}
-  .status{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0 4px}
-  .status span{border:2px solid var(--ink);padding:6px 12px;font-weight:700;background:#fff;font-size:16px;display:flex;align-items:center;gap:6px}
-  .status span.done{background:var(--ink);color:var(--paper)}
-  .banner{text-align:center;font-size:clamp(22px,6vw,32px);font-weight:900;margin:12px 0 4px}
-  .banner .ok{color:var(--blue)} .banner .no{color:var(--red)} .banner .na{color:var(--muted)}
-  .board{list-style:none;margin:12px 0;display:grid;gap:6px}
-  .board li{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--ink);padding:9px 12px;font-weight:700}
-  .board .rk{font-family:'Black Han Sans',sans-serif;font-weight:400;width:26px;font-size:20px}
-  .board .sc{margin-left:auto;font-family:'Black Han Sans',sans-serif;font-weight:400;font-size:22px}
-  .board .d{font-size:13px;width:38px;text-align:right}
-  .board .d.p{color:var(--blue)} .board .d.m{color:var(--red)}
-  .board li.win{background:#fff6d6}
-  .board .sub2{font-size:12px;color:var(--muted);font-weight:400}
-  body.host .board li{font-size:22px;padding:12px 16px}
-  .secret{background:var(--card);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:16px 18px;margin:14px 0;animation:pop .35s ease-out}
-  .secret .no{font-family:'Nanum Gothic Coding',monospace;font-size:13px;color:var(--red);font-weight:700}
-  .secret p{font-size:18px;line-height:1.65;margin-top:5px}
-  .secret p b{color:var(--red)}
-  body.host .secret p{font-size:24px}
-  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .history{border-left:4px solid var(--ink);padding:4px 0 4px 16px;margin:22px 0;font-size:16px;line-height:1.75}
-  .law{background:var(--ink);color:var(--paper);padding:24px 20px;margin:22px 0;text-align:center}
-  .law .art{font-family:'Nanum Gothic Coding',monospace;font-size:13px;opacity:.75}
-  .law blockquote{font-family:'Black Han Sans',sans-serif;font-size:clamp(22px,5.4vw,34px);line-height:1.35;margin:10px 0 12px}
-  .law p{font-size:16px;line-height:1.7;opacity:.92}
-  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--red);color:#fff;padding:10px 16px;font-weight:700;border-radius:3px;z-index:9;max-width:90vw;text-align:center}
-  .warnbox{border:2px solid var(--red);color:var(--red);padding:10px;font-size:14px;margin:10px 0;font-weight:700}
-  @media (max-width:760px){ .lobby{grid-template-columns:1fr} }
-  @media (max-width:520px){ .wrap{padding:16px 10px 50px} .checklist ul{grid-template-columns:1fr} .pair{gap:8px} .card .lbl{font-size:11px;padding:5px 6px} }
+  /* ---------- result ---------- */
+  .result{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:8px}
+  .empty{font-size:14px;color:var(--muted);text-align:center;padding:26px 0}
+  .qr-wrap{display:flex;justify-content:center;margin-bottom:16px}
+  canvas#qr{width:200px;height:200px;image-rendering:pixelated;border-radius:6px}
+  .link-box{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;color:#55524c;
+    background:var(--bg);border-radius:10px;padding:10px 12px;word-break:break-all;max-height:84px;overflow:auto}
+  .stats{display:flex;gap:8px;margin:12px 0 16px}
+  .stat{flex:1;background:var(--bg);border-radius:10px;padding:10px 12px}
+  .stat b{display:block;font-size:18px;font-weight:700}
+  .stat span{font-size:11px;color:var(--muted)}
+  .fit{font-size:14px;font-weight:500;padding:11px 12px;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .fit.ok{background:#e8f3ec;color:var(--ok)}
+  .fit.bad{background:#f8e6e1;color:var(--bad)}
+  .bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden;margin:-6px 0 16px}
+  .bar i{display:block;height:100%;background:var(--ok);transition:width .2s}
+  .bar.over i{background:var(--bad)}
+  .btns{display:flex;gap:8px}
+  button,.btn{
+    flex:1;font:inherit;font-size:15px;font-weight:500;border:0;border-radius:12px;padding:14px;cursor:pointer;
+    text-align:center;text-decoration:none;-webkit-tap-highlight-color:transparent
+  }
+  .primary{background:var(--ink);color:#fff}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  button:active,.btn:active{transform:scale(.98)}
+
+  details{margin-top:18px;font-size:13px;color:var(--muted)}
+  summary{cursor:pointer;padding:4px 0}
+  details .inner{padding-top:10px;line-height:1.6}
+  details input{font-size:13px!important;padding:10px 12px!important;margin-top:6px}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--ink);color:#fff;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---------- pledge card ---------- */
+  #view{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 22px}
+  .card{
+    width:100%;max-width:380px;aspect-ratio:3/4.2;background:var(--paper);border-radius:22px;position:relative;
+    padding:34px 30px 30px;display:flex;flex-direction:column;
+    box-shadow:0 1px 2px rgba(0,0,0,.04),0 18px 40px -12px rgba(60,40,20,.18);
+    animation:rise .7s cubic-bezier(.2,.8,.2,1) both
+  }
+  .card::after{content:"";position:absolute;inset:10px;border:1px solid var(--line);border-radius:15px;pointer-events:none}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .year{font-family:var(--serif);font-size:56px;font-weight:700;line-height:1;letter-spacing:-.02em}
+  .year em{font-style:normal;color:var(--accent)}
+  .seal{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--serif);
+    font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg)}
+  .card-label{font-size:11px;letter-spacing:.22em;color:var(--muted);margin-top:12px}
+  .pledge{flex:1;display:flex;align-items:center;font-family:var(--serif);font-weight:500;
+    font-size:22px;line-height:1.65;word-break:keep-all;overflow-wrap:anywhere;white-space:pre-wrap;padding:18px 0}
+  .pledge.small{font-size:18px}
+  .pledge.xsmall{font-size:15.5px}
+  .sign{border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:baseline}
+  .sign .name{font-family:var(--serif);font-size:18px;font-weight:700}
+  .sign .date{font-size:11px;color:var(--muted);letter-spacing:.1em}
+  .view-foot{margin-top:26px;display:flex;gap:10px;width:100%;max-width:380px}
+  .view-foot .btn{font-size:14px;padding:12px}
+  .err{max-width:380px;text-align:center;color:var(--muted);font-size:15px;line-height:1.7}
+  @keyframes rise{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8"/>
-  </filter>
-  <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(40)">
-    <line x1="0" y1="0" x2="0" y2="4" stroke="#000" stroke-width="1.1" opacity=".35"/>
-  </pattern>
-</defs></svg>
-<div class="wrap" id="app"></div>
-<div class="toast hidden" id="toast"></div>
+
+<!-- ============ 생성 화면 ============ -->
+<main id="maker" class="hidden">
+  <p class="eyebrow">2027 New Year · NFC Keyring</p>
+  <h1>다짐 카드 만들기</h1>
+  <p class="lead">이름과 다짐을 적으면, 그 내용이 담긴 개인 링크가 만들어져요. 링크를 NFC 키링에 쓰면 태그할 때마다 카드가 열려요.</p>
+
+  <div class="field">
+    <label for="name">이름</label>
+    <input id="name" type="text" maxlength="20" placeholder="예: 김하늘" autocomplete="off">
+  </div>
+  <div class="field">
+    <label for="pledge">2027년 나의 다짐</label>
+    <textarea id="pledge" maxlength="120" placeholder="예: 매일 아침 10분씩 책 읽기"></textarea>
+    <div class="count"><span id="cnt">0</span> / 120</div>
+  </div>
+
+  <section class="result">
+    <div id="empty" class="empty">이름과 다짐을 입력하면 링크가 생겨요</div>
+    <div id="out" class="hidden">
+      <div class="qr-wrap"><canvas id="qr" width="200" height="200" aria-label="QR 코드"></canvas></div>
+      <div class="link-box" id="link"></div>
+      <div class="stats">
+        <div class="stat"><b id="bytes">0</b><span>링크 바이트</span></div>
+        <div class="stat"><b id="ndef">0</b><span>NDEF 기록 크기 / 504</span></div>
+      </div>
+      <div class="bar" id="bar"><i></i></div>
+      <div class="fit" id="fit"></div>
+      <div class="btns">
+        <button class="primary" id="copy">링크 복사</button>
+        <a class="btn ghost" id="preview" href="#">카드 미리보기</a>
+      </div>
+    </div>
+  </section>
+
+  <details>
+    <summary>링크 주소 설정</summary>
+    <div class="inner">
+      카드가 열릴 페이지 주소예요. 이 페이지를 다른 곳(예: GitHub Pages)에 올렸다면 그 주소로 바꿔 주세요.
+      <input id="base" type="text" spellcheck="false" autocomplete="off">
+    </div>
+  </details>
+</main>
+
+<!-- ============ 카드 화면 ============ -->
+<section id="view" class="hidden">
+  <div class="card" id="card">
+    <div class="card-top">
+      <div class="year">20<em>27</em></div>
+      <div class="seal">다짐</div>
+    </div>
+    <div class="card-label">NEW YEAR PLEDGE · 새해 다짐</div>
+    <div class="pledge" id="vPledge"></div>
+    <div class="sign">
+      <span class="name" id="vName"></span>
+      <span class="date">JAN 1, 2027</span>
+    </div>
+  </div>
+  <div class="view-foot">
+    <a class="btn ghost" id="makeMine" href="#">나도 만들기</a>
+  </div>
+</section>
+
+<section id="bad" class="hidden" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+  <p class="err">카드 정보를 읽지 못했어요.<br>링크가 잘렸는지 확인해 주세요.</p>
+  <div class="view-foot" style="max-width:240px"><a class="btn ghost" href="#">새로 만들기</a></div>
+</section>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const APP_URL   = <?!= JSON.stringify(appUrl) ?>;
-const INIT_CODE = <?!= JSON.stringify(initCode) ?>;
-const HOST_MODE = <?!= JSON.stringify(hostMode) ?>;
-</script>
-<script>
-(function(){
-/* ================= 공통 ================= */
-const $ = s => document.querySelector(s);
-const app = $("#app");
-const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const api = (fn,...args) => new Promise((res,rej)=>{
-  google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(e))[fn](...args);
-});
-const errMsg = e => String((e && e.message) || e).replace(/^Error:\s*/,"").replace(/^Exception:\s*/,"");
-let toastT;
-function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.remove("hidden"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.add("hidden"),3200); }
-const ls = {
-  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
-  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
-  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
-};
+/* =========================================================
+   설정: 기본 링크 주소 (게시된 아티팩트 주소)
+   ========================================================= */
+const DEFAULT_BASE = "https://thddk06.github.io/pledge/";
+const NTAG215_USER_BYTES = 504;
 
-/* ================= 몽타주 생성 (시드 고정 → 모든 기기에서 같은 얼굴) ================= */
-function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-function faceParams(seed, r, k, high){
-  const rng = mulberry32((seed ^ (r*7919 + k*104729 + 17)) >>> 0);
-  const rr = () => high ? 0.58 + rng()*0.42 : rng()*0.38;
-  const p = { jaw:rr(), ridge:rr(), asym:rr(), ears:rr(), forehead:rr(), brow:rr(), eyes:rr(), lips:rr(),
-    hair:Math.floor(rng()*4), noseW:rng(), mouthW:rng(), faceW:rng(), stubble:rng()<0.35, glasses:rng()<0.15 };
-  p.rng = rng; return p;
+/* =========================================================
+   인코딩: 이름 \x1f 다짐 → 바이트 → (선택적 압축) → base62
+   해시에는 영문·숫자만 들어가도록 base62 사용
+   첫 글자 = 형식 (a: UTF-8, b: UTF-16, c: 압축 UTF-8, d: 압축 UTF-16)
+   ========================================================= */
+const B62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+function toB62(bytes){
+  let n = 1n; // 앞자리 0 바이트 보존용 센티넬
+  for (const b of bytes) n = (n << 8n) | BigInt(b);
+  let s = "";
+  while (n > 0n){ s = B62[Number(n % 62n)] + s; n /= 62n; }
+  return s;
 }
-const lombroso = p => Math.round((p.jaw+p.ridge+p.asym+p.ears+p.forehead+p.brow+p.eyes+p.lips)/8*100);
-const faceCache = {};
-function faceSVG(seed, r, k, high, age){
-  const key = seed+":"+r+":"+k;
-  if(faceCache[key]) return faceCache[key];
-  const p = faceParams(seed,r,k,high), R = p.rng, rnd=(a,b)=>a+R()*(b-a);
-  const cx=100, a=p.asym*7, ag=(age-22)/41;
-  const fh=44+p.faceW*6, jh=26+p.jaw*20, jawY=166+p.jaw*10, chinY=204+p.jaw*6, chh=7+p.jaw*15, topY=36;
-  const hairY=52+p.forehead*26, eyeY=116, browY=96+p.ridge*8;
-  const exL=cx-20, exR=cx+20+a*0.4, eyR=eyeY-a*0.7;
-  const erx=8.5-p.eyes*4, ery=3.8-p.eyes*1.4, earH=21+p.ears*17, earW=8+p.ears*10;
-  const noseY=148+p.jaw*2, nw=7+p.noseW*6, mY=172+p.jaw*4, mw=13+p.mouthW*8;
-  const S='stroke="#232220" stroke-linecap="round" stroke-linejoin="round" fill="none"';
-  let s=`<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">`;
-  for(let y=20;y<240;y+=20) s+=`<line x1="0" x2="200" y1="${y}" y2="${y}" stroke="#232220" stroke-width=".6" opacity=".12"/>`;
-  s+=`<g filter="url(#pencil)">`;
-  s+=`<path d="M6 240 Q14 212 ${cx-27} 208 L ${cx-22} 186 L ${cx+22} 186 L ${cx+27} 208 Q186 212 194 240 Z" fill="#e2ddd2" stroke="#232220" stroke-width="1.8" stroke-linejoin="round"/>`;
-  s+=`<path d="M${cx-27} 208 L ${cx} 230 L ${cx+27} 208" ${S} stroke-width="1.4"/>`;
-  const earL=cx-fh-earW*0.3, earR=cx+fh+a+earW*0.3;
-  s+=`<ellipse cx="${earL}" cy="118" rx="${earW*0.62}" ry="${earH*0.5}" fill="#f1ece2" stroke="#232220" stroke-width="1.8"/>`;
-  s+=`<ellipse cx="${earR}" cy="${118-a*0.5}" rx="${earW*0.62}" ry="${earH*0.5}" fill="#f1ece2" stroke="#232220" stroke-width="1.8"/>`;
-  s+=`<path d="M${earL+earW*0.15} ${118-earH*0.28} Q${earL-earW*0.3} 118 ${earL+earW*0.1} ${118+earH*0.25}" ${S} stroke-width="1.1" opacity=".6"/>`;
-  s+=`<path d="M${earR-earW*0.15} ${118-a*0.5-earH*0.28} Q${earR+earW*0.3} ${118-a*0.5} ${earR-earW*0.1} ${118-a*0.5+earH*0.25}" ${S} stroke-width="1.1" opacity=".6"/>`;
-  const Rt=cx+fh+a, L=cx-fh;
-  s+=`<path d="M${cx} ${topY} C${cx+32} ${topY} ${Rt} 52 ${Rt} 104 C${Rt} 138 ${cx+jh+a} ${jawY-12} ${cx+jh+a*0.6} ${jawY}
-    Q${cx+jh*0.75+a*0.4} ${chinY-2} ${cx+chh} ${chinY} L${cx-chh} ${chinY} Q${cx-jh*0.75} ${chinY-2} ${cx-jh} ${jawY}
-    C${cx-jh} ${jawY-12} ${L} 138 ${L} 104 C${L} 52 ${cx-32} ${topY} ${cx} ${topY} Z" fill="#f4f0e7" stroke="#232220" stroke-width="2"/>`;
-  s+=`<path d="M${cx-jh+4} ${jawY+2} Q${cx} ${chinY+4} ${cx+jh+a*0.6-4} ${jawY+2} L${cx+chh} ${chinY-1} L${cx-chh} ${chinY-1} Z" fill="url(#hatch)" opacity="${0.15+p.jaw*0.5}"/>`;
-  const capTop=topY-14;
-  const cap=`M${L-1} ${hairY+12} C${L-7} ${capTop} ${Rt+7} ${capTop} ${Rt+1} ${hairY+12} Q${cx+fh*0.5} ${hairY-4} ${cx} ${hairY} Q${cx-fh*0.5} ${hairY-4} ${L-1} ${hairY+12} Z`;
-  if(p.hair===0) s+=`<path d="${cap}" fill="#3b3a37" stroke="#232220" stroke-width="1.6"/><path d="${cap}" fill="url(#hatch)"/>`;
-  else if(p.hair===1) s+=`<path d="${cap}" fill="#77736b" stroke="#232220" stroke-width="1.6"/><path d="${cap}" fill="url(#hatch)" opacity=".6"/><path d="M${cx-14} ${hairY-2} Q${cx-18} ${topY+4} ${cx-10} ${topY-4}" ${S} stroke-width="1.4"/>`;
-  else if(p.hair===2){ s+=`<path d="${cap}" fill="#4a4844" stroke="#232220" stroke-width="1.4"/>`;
-    for(let i=0;i<=12;i++){ const t=i/12, x=L+t*(Rt-L), y=hairY+8-Math.sin(t*Math.PI)*(hairY-capTop-6);
-      s+=`<circle cx="${x}" cy="${y}" r="${5+R()*2}" fill="#4a4844" stroke="#232220" stroke-width="1.2"/>`; } }
-  else { s+=`<path d="${cap}" fill="#a39e94" stroke="#232220" stroke-width="1.4" opacity=".85"/>`;
-    for(let i=0;i<70;i++){ const t=R(), x=L+t*(Rt-L), y=hairY+6-R()*Math.sin(t*Math.PI)*(hairY-capTop-4);
-      s+=`<circle cx="${x}" cy="${y}" r=".8" fill="#232220" opacity=".6"/>`; } }
-  if(ag>0.55 && browY-hairY>18){ const y=(hairY+browY)/2;
-    s+=`<path d="M${cx-18} ${y} Q${cx} ${y-3} ${cx+18} ${y}" ${S} stroke-width="1" opacity=".45"/><path d="M${cx-13} ${y+6} Q${cx} ${y+3} ${cx+13} ${y+6}" ${S} stroke-width="1" opacity=".35"/>`; }
-  s+=`<ellipse cx="${exL}" cy="${browY+5}" rx="15" ry="${3+p.ridge*4}" fill="#000" opacity="${0.04+p.ridge*0.2}"/>`;
-  s+=`<ellipse cx="${exR}" cy="${browY+5-a*0.7}" rx="15" ry="${3+p.ridge*4}" fill="#000" opacity="${0.04+p.ridge*0.2}"/>`;
-  s+=`<path d="M${exL-16} ${browY+7} Q${cx} ${browY+1} ${exR+16} ${browY+7-a*0.7}" ${S} stroke-width="1.1" opacity="${p.ridge*0.6}"/>`;
-  const bw=1.8+p.brow*5;
-  s+=`<path d="M${exL-14} ${browY+2} Q${exL-2} ${browY-3} ${exL+12} ${browY}" ${S} stroke-width="${bw}"/>`;
-  s+=`<path d="M${exR-12} ${browY-a*0.7} Q${exR+2} ${browY-3-a*0.7} ${exR+14} ${browY+2-a*0.7}" ${S} stroke-width="${bw}"/>`;
-  if(p.brow>0.8) s+=`<path d="M${exL+12} ${browY} Q${cx} ${browY+1.5} ${exR-12} ${browY-a*0.7}" ${S} stroke-width="${bw*0.55}"/>`;
-  [[exL,eyeY],[exR,eyR]].forEach(([x,y])=>{
-    s+=`<ellipse cx="${x}" cy="${y}" rx="${erx}" ry="${ery}" fill="#fff" stroke="#232220" stroke-width="1.3"/><circle cx="${x}" cy="${y}" r="${ery*0.85}" fill="#232220"/>`;
-    s+=`<path d="M${x-erx-1.5} ${y} Q${x} ${y-ery*2.3} ${x+erx+1.5} ${y}" ${S} stroke-width="1.8"/>`;
-    if(ag>0.5) s+=`<path d="M${x-erx+1} ${y+ery+3} Q${x} ${y+ery+6} ${x+erx-1} ${y+ery+3}" ${S} stroke-width=".9" opacity=".45"/>`;
-  });
-  if(p.glasses){
-    s+=`<circle cx="${exL}" cy="${eyeY}" r="13" ${S} stroke-width="1.6"/><circle cx="${exR}" cy="${eyR}" r="13" ${S} stroke-width="1.6"/>`;
-    s+=`<path d="M${exL+13} ${eyeY-1} Q${cx} ${eyeY-5} ${exR-13} ${eyR-1}" ${S} stroke-width="1.4"/><path d="M${exL-13} ${eyeY-2} L${L+1} ${eyeY-4}" ${S} stroke-width="1.4"/><path d="M${exR+13} ${eyR-2} L${Rt-1} ${eyR-4}" ${S} stroke-width="1.4"/>`;
-  }
-  s+=`<path d="M${cx-1} ${eyeY+4} Q${cx-5} ${eyeY+22} ${cx-nw} ${noseY}" ${S} stroke-width="1.4"/>`;
-  s+=`<path d="M${cx-nw} ${noseY} Q${cx-nw*0.6} ${noseY+5} ${cx} ${noseY+3} Q${cx+nw*0.6} ${noseY+5} ${cx+nw} ${noseY}" ${S} stroke-width="1.5"/>`;
-  s+=`<ellipse cx="${cx-nw*0.45}" cy="${noseY+1.5}" rx="2" ry="1.2" fill="#232220" opacity=".55"/><ellipse cx="${cx+nw*0.45}" cy="${noseY+1.5}" rx="2" ry="1.2" fill="#232220" opacity=".55"/>`;
-  if(ag>0.45){
-    s+=`<path d="M${cx-nw-4} ${noseY-2} Q${cx-nw-9} ${mY-4} ${cx-mw-2} ${mY+5}" ${S} stroke-width="1" opacity=".45"/><path d="M${cx+nw+4} ${noseY-2} Q${cx+nw+9} ${mY-4} ${cx+mw+2} ${mY+5}" ${S} stroke-width="1" opacity=".45"/>`;
-  }
-  const d=7-p.lips*5.5;
-  if(p.lips<0.6) s+=`<path d="M${cx-mw*0.7} ${mY-1} Q${cx-4} ${mY-5+p.lips*3} ${cx} ${mY-3} Q${cx+4} ${mY-5+p.lips*3} ${cx+mw*0.7} ${mY-1}" ${S} stroke-width="1.1" opacity=".55"/>`;
-  s+=`<path d="M${cx-mw} ${mY} Q${cx} ${mY+2} ${cx+mw} ${mY+a*0.35}" ${S} stroke-width="1.9"/>`;
-  s+=`<path d="M${cx-mw*0.55} ${mY+3} Q${cx} ${mY+3+d} ${cx+mw*0.55} ${mY+3}" ${S} stroke-width="1.2" opacity=".7"/>`;
-  if(p.stubble){
-    for(let i=0;i<90;i++){ const y=rnd(mY-10,chinY-3), half=(y<jawY?jh:jh-(y-jawY)*(jh-chh)/(chinY-jawY))-5;
-      const x=cx+rnd(-half,half); if(Math.abs(x-cx)<mw+2 && Math.abs(y-mY-2)<6) continue;
-      s+=`<circle cx="${x}" cy="${y}" r=".7" fill="#232220" opacity=".5"/>`; }
-  }
-  s+=`</g></svg>`;
-  return (faceCache[key] = {svg:s, l:lombroso(p)});
+function fromB62(s){
+  let n = 0n;
+  for (const c of s){ const v = B62.indexOf(c); if (v < 0) throw 0; n = n * 62n + BigInt(v); }
+  const out = [];
+  while (n > 1n){ out.unshift(Number(n & 255n)); n >>= 8n; }
+  if (n !== 1n) throw 0;
+  return new Uint8Array(out);
 }
+const utf8 = s => new TextEncoder().encode(s);
+function utf16(s){ const a = new Uint8Array(s.length*2); for (let i=0;i<s.length;i++){ const c=s.charCodeAt(i); a[2*i]=c>>8; a[2*i+1]=c&255; } return a; }
+function unUtf16(a){ let s=""; for (let i=0;i+1<a.length;i+=2) s+=String.fromCharCode((a[i]<<8)|a[i+1]); return s; }
 
-/* ================= 상태 ================= */
-const S = { role:null, code:"", hostKey:"", pid:"", sid:"", name:"", gameNo:0,
-  view:null, ver:0, offset:0, lastKey:"", sel:{key:"",c:null,b:1,sent:false}, revealSent:{}, polling:false, timer:null, gone:false };
-const now = () => Date.now() + S.offset;
-const LETTER = ["A","B"];
+async function streamBytes(bytes, Stream, mode){
+  const cs = new Stream(mode);
+  const res = new Response(new Blob([bytes]).stream().pipeThrough(cs));
+  return new Uint8Array(await res.arrayBuffer());
+}
+const canZip = typeof CompressionStream !== "undefined" && typeof DecompressionStream !== "undefined";
 
-/* ================= 폴링 ================= */
-let pollT=null, inFlight=false;
-function startPolling(){ if(S.polling) return; S.polling=true; poll(); if(!S.timer) S.timer=setInterval(tick,250); }
-function stopPolling(){ S.polling=false; clearTimeout(pollT); }
-async function poll(force){
-  if(!S.polling) return;
-  clearTimeout(pollT);
-  if(inFlight && !force){ pollT=setTimeout(poll,300); return; }
-  inFlight=true;
-  try{
-    const res = await api("getState", S.code, S.pid||"", S.hostKey||"", force?0:S.ver);
-    S.offset = res.now - Date.now();
-    if(res.gone){ S.gone=true; render(); }
-    else if(res.room){ S.view=res.room; S.ver=res.room.ver; S.gone=false; render(); }
-  }catch(e){ /* 네트워크 오류는 다음 폴링에서 재시도 */ }
-  inFlight=false;
-  const ph = S.view && S.view.phase;
-  pollT=setTimeout(poll, (ph==="pick"||ph==="reveal") ? 900 : 1500);
-}
-function tick(){
-  const v=S.view; if(!v) return;
-  const el=document.getElementById("timer");
-  if(v.phase==="pick" && el){
-    const left=Math.max(0,Math.ceil((v.deadline-now())/1000));
-    el.textContent=left; el.classList.toggle("low",left<=5);
-  }
-  if(S.role==="host" && v.phase==="pick"){
-    const k=v.gameNo+":"+v.round;
-    const act = activePlayers(v);
-    const allIn = act.length>0 && act.every(p=>p.submitted);
-    if(!S.revealSent[k] && (allIn || now()>v.deadline+600)){
-      S.revealSent[k]=true;
-      api("reveal",S.code,S.hostKey).then(()=>poll(true)).catch(e=>{ S.revealSent[k]=false; toast(errMsg(e)); });
-    }
-  }
-}
-const activePlayers = v => v.sd ? v.players.filter(p=>v.sd.ids.includes(p.id)) : v.players;
-async function hostAct(fn){
-  try{ await api(fn,S.code,S.hostKey); poll(true); }catch(e){ toast(errMsg(e)); }
-}
-
-/* ================= 렌더링 ================= */
-function render(){
-  document.body.classList.toggle("host", S.role==="host");
-  if(!S.role) return;                // 입장 화면은 별도
-  if(S.gone){ app.innerHTML = goneScreen(); bindGone(); S.lastKey="gone"; return; }
-  const v=S.view; if(!v) return;
-  if(S.role==="player" && !v.me){ const k="out:"+v.gameNo; if(S.lastKey!==k){ S.lastKey=k; app.innerHTML=outScreen(v); bindOut(); } return; }
-  const key=[v.phase,v.gameNo,v.round,v.secret,(v.sd?"sd":"")].join(":");
-  if(key!==S.lastKey){ S.lastKey=key; build(v); window.scrollTo(0,0); }
-  update(v);
-}
-function build(v){
-  const H=S.role==="host";
-  const fn = {lobby: H?hostLobby:playerLobby, pick: H?hostPick:playerPick, reveal: revealScreen,
-              final: finalScreen, secret: secretScreen, ending: secretScreen}[v.phase];
-  app.innerHTML = fn(v);
-  bind(v);
-}
-
-/* ---- 공통 조각 ---- */
-function meBar(v){
-  if(S.role!=="player"||!v.me) return `<span class="tag">진행자 화면 · 코드 ${esc(v.code)}</span>`;
-  const p=v.players.find(x=>x.id===v.me.id);
-  return `<span class="me"><span class="dot" style="background:${v.me.color}"></span>${esc(v.me.name)} · <span id="myScore">${p?p.score:0}</span>점</span>`;
-}
-function roundTag(v){
-  if(v.round>=v.rounds_main) return `<span class="tag red">서든데스 ${v.round-v.rounds_main+1}</span>`;
-  return `<span class="tag">사건 파일 ${String(v.round+1).padStart(2,"0")} / ${String(v.rounds_main).padStart(2,"0")}</span>`;
-}
-function card(v, k, opts){
-  const rd=v.rounds[v.round], f=faceSVG(v.seed,v.round,k,rd.hi===k,rd.ages[k]);
-  const out = rd.out && rd.out[k];
-  const tagName = opts.button ? "button" : "div";
-  let h=`<${tagName} class="card${opts.sel?" sel":""}" data-k="${k}" ${opts.disabled?"disabled":""}>
-    <div class="lbl"><span class="big">피고인 ${LETTER[k]}</span><span>${rd.ages[k]}세</span></div>${f.svg}`;
-  if(out){
-    const free=out.s===0;
-    h+=`<div class="stamp ${free?"free":"guilty"}">${free?"무죄":esc(out.v.split("\n")[0])}</div>
-      <div class="reveal"><div class="crime">${esc(out.c)}</div><div class="verdict ${free?"free":"guilty"}">${esc(out.v)}</div>
-      <div class="lmb">롬브로소 지수 ${f.l}</div><div class="meter"><span style="width:${f.l}%"></span></div>
-      <div class="chips">${v.players.filter(p=>p.picks[v.round] && p.picks[v.round].c===k)
-        .map(p=>`<span class="chip" style="background:${p.color}">${esc(p.name)}${v.sd?"":" "+p.picks[v.round].b+"점"}</span>`).join("")}</div></div>`;
-  }
-  return h+`</${tagName}>`;
-}
-function board(v, opts){
-  const r=v.round;
-  const list=v.players.slice().sort((a,b)=>b.score-a.score);
-  let rank=0, prev=null;
-  return `<ul class="board">${list.map((p,i)=>{
-    if(p.score!==prev){ rank=i+1; prev=p.score; }
-    const d=p.deltas[r];
-    const dTxt = opts && opts.delta && d!==undefined ? `<span class="d ${d>0?"p":d<0?"m":""}">${d>0?"+":""}${d}</span>` : "";
-    return `<li><span class="rk">${rank}</span><span class="dot" style="background:${p.color}"></span>${esc(p.name)}<span class="sc">${p.score}</span>${dTxt}</li>`;
-  }).join("")}</ul>`;
-}
-const SCRIPT = {
-  lobby:"휴대폰으로 QR을 찍고 학번과 이름을 입력해 주세요! 기다리는 동안 화면에 나온 롬브로소 박사의 ‘범죄자 얼굴 체크리스트’를 읽어 보세요.",
-  pick:"두 피고인 중 더 무거운 형을 받은 사람은? 자신 있을수록 크게 거세요. 맞히면 건 만큼 얻고, 틀리면 건 만큼 잃어요!",
-  sd:"동점입니다! 서든데스로 승부를 가립니다. 맞히는 사람만 1점!",
-  reveal:"판결 공개! 롬브로소 지수가 높은 쪽이 정말 무거운 형을 받았나요?",
-  final:"우승자 발표! 축하합니다… 그런데 잠깐, 사실 우리에게 비밀이 있어요.",
-  secret:"비밀을 하나씩 소리 내어 읽어 주세요.",
-  ending:"헌법 제27조 제4항을 같이 읽어 볼까요? 우승자는 상품을 받아 가세요!"
-};
-const script = k => `<div class="script"><b>진행 멘트</b>${SCRIPT[k]}</div>`;
-const CHECK = `<div class="panel checklist"><b class="mono" style="font-size:14px">롬브로소 박사의 ‘범죄자 얼굴’ 체크리스트</b><ul>
-  <li>툭 튀어나온 눈썹뼈</li><li>크고 각진 턱</li><li>좌우 비대칭인 얼굴</li><li>크고 튀어나온 귀</li>
-  <li>좁고 낮은 이마</li><li>짙고 이어진 눈썹</li><li>작은 눈</li><li>얇은 입술</li></ul></div>`;
-
-/* ---- 진행자: 대기실 ---- */
-function hostLobby(v){
-  const url = APP_URL + "?code=" + v.code;
-  return `<div class="topbar"><span class="tag">진행자 화면 · ${v.gameNo}번째 판</span><button class="linkbtn" id="logout">진행자 나가기</button></div>
-  <div class="lobby">
-    <div class="panel center">
-      <div class="mono" style="font-size:14px;font-weight:700">참여 코드</div>
-      <div class="bigcode">${esc(v.code)}</div>
-      <div class="qr" id="qr"></div>
-      <div class="url">${esc(url)}</div>
-    </div>
-    <div>
-      <h1 style="font-size:clamp(30px,5vw,46px)">관상 수사대 <em>대기실</em></h1>
-      <div id="plist"></div>
-      <button class="btn block red" id="start">게임 시작</button>
-      ${script("lobby")}
-      <div id="hostInfo"></div>
-    </div>
-  </div>`;
-}
-function hostLobbyUpdate(v){
-  const n=v.players.length;
-  let h=`<div class="mono" style="font-size:13px;font-weight:700">참가자 ${n} / ${v.maxPlayers}</div><ul class="plist">`;
-  v.players.forEach(p=>{ h+=`<li><span class="dot" style="background:${p.color}"></span>${esc(p.name)}<button class="linkbtn x" data-kick="${p.id}">내보내기</button></li>`; });
-  for(let i=n;i<v.maxPlayers;i++) h+=`<li class="empty">빈 자리</li>`;
-  $("#plist").innerHTML=h+"</ul>";
-  $("#start").disabled = n<v.minPlayers;
-  $("#start").textContent = n<v.minPlayers ? `${v.minPlayers}명 이상 모이면 시작할 수 있어요` : `${n}명으로 게임 시작`;
-  const st=v.stats||{players:0,hi:0,picks:0};
-  let info=`<div class="panel"><div class="stats"><div>오늘 참여자<b>${st.players}명</b></div><div>‘범죄자형’ 얼굴 선택률<b>${st.picks?Math.round(st.hi/st.picks*100):0}%</b></div></div>`;
-  if(v.history && v.history.length){
-    info+=`<div class="mono" style="font-size:12px;font-weight:700;margin-top:12px">최근 우승자</div><table class="mini">`+
-      v.history.map(h=>`<tr><td>${h.no}번째 판</td><td><b>${esc(h.names)}</b></td><td>${h.score}점</td><td>${new Date(h.t).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}</td></tr>`).join("")+`</table>`;
-  }
-  info+=`</div>`;
-  if(v.logError) info+=`<div class="warnbox">구글 시트 기록 실패: ${esc(v.logError)}</div>`;
-  $("#hostInfo").innerHTML=info;
-}
-
-/* ---- 참가자: 대기실 ---- */
-function playerLobby(v){
-  return `<div class="topbar">${meBar(v)}<span class="tag">코드 ${esc(v.code)}</span></div>
-  <h1>관상 수사대<br><em>롬브로소의 몽타주</em></h1>
-  <div class="wait">입장 완료! 진행자가 게임을 시작할 때까지 기다려 주세요.<br><span id="pcount" class="sub"></span></div>
-  <p class="sub" style="margin-top:16px">당신은 1876년의 수사관. 롬브로소 박사는 “범죄자는 타고나며, 그 표시는 얼굴에 드러난다”고 말했어요.
-    박사의 체크리스트로 <b>더 무거운 형을 받은 피고인</b>을 가려내세요. 매 라운드 확신도(1~3점)를 걸 수 있어요. 맞히면 얻고, 틀리면 잃어요!</p>
-  ${CHECK}`;
-}
-
-/* ---- 진행자: 라운드 ---- */
-function hostPick(v){
-  return `<div class="topbar">${roundTag(v)}<div class="timer" id="timer">${Math.max(0,Math.ceil((v.deadline-now())/1000))}</div></div>
-  <div class="q center">더 무거운 형을 받은 피고인은?<small>각자 휴대폰에서 고르고 확신도를 거세요</small></div>
-  <div class="pair">${card(v,0,{})}${card(v,1,{})}</div>
-  <div class="status" id="status"></div>
-  <div class="center"><button class="btn ghost" id="forceReveal" style="margin-top:8px">지금 바로 공개</button></div>
-  ${script(v.sd?"sd":"pick")}`;
-}
-function hostPickUpdate(v){
-  $("#status").innerHTML = activePlayers(v).map(p=>`<span class="${p.submitted?"done":""}"><span class="dot" style="background:${p.color}"></span>${esc(p.name)} ${p.submitted?"✓":"…"}</span>`).join("");
-}
-
-/* ---- 참가자: 라운드 ---- */
-function playerPick(v){
-  const k=v.gameNo+":"+v.round;
-  if(S.sel.key!==k) S.sel={key:k,c:null,b:1,sent:false};
-  if(v.me.pick){ S.sel.sent=true; S.sel.c=v.me.pick.c; S.sel.b=v.me.pick.b; }
-  const inSD = !v.sd || v.sd.ids.includes(v.me.id);
-  let h=`<div class="topbar">${meBar(v)}${roundTag(v)}<div class="timer" id="timer">${Math.max(0,Math.ceil((v.deadline-now())/1000))}</div></div>`;
-  if(!inSD){
-    return h+`<div class="pair">${card(v,0,{})}${card(v,1,{})}</div><div class="wait">동점자끼리 서든데스 중이에요. 함께 지켜봐 주세요!</div>`;
-  }
-  h+=`<div class="q">더 무거운 형을 받은 피고인은?<small>${v.sd?"서든데스! 맞히면 1점":"얼굴을 눌러 고르세요"}</small></div>
-  <div class="pair" id="pair">${card(v,0,{button:true,sel:S.sel.c===0,disabled:S.sel.sent})}${card(v,1,{button:true,sel:S.sel.c===1,disabled:S.sel.sent})}</div>`;
-  if(!v.sd) h+=`<div style="margin-top:14px"><b class="mono" style="font-size:13px">확신도 걸기</b><div class="bets" id="bets">
-    ${[1,2,3].map(b=>`<button class="bet${S.sel.b===b?" on":""}" data-b="${b}" ${S.sel.sent?"disabled":""}>${b}점<small>${["그냥 감","꽤 확신","100% 확신"][b-1]}</small></button>`).join("")}</div></div>`;
-  h+=`<div id="pickFoot"></div>`;
-  return h;
-}
-function playerPickFoot(v){
-  const el=$("#pickFoot"); if(!el) return;
-  if(S.sel.sent) el.innerHTML=`<div class="wait">제출 완료! 피고인 ${LETTER[S.sel.c]}${v.sd?"":" · "+S.sel.b+"점"}<br><span class="sub">다른 수사관을 기다리는 중…</span></div>`;
-  else el.innerHTML=`<button class="btn block red" id="send" ${S.sel.c===null?"disabled":""}>${S.sel.c===null?"피고인을 먼저 고르세요":"피고인 "+LETTER[S.sel.c]+(v.sd?"":" · "+S.sel.b+"점")+" 제출"}</button>`;
-  const b=$("#send"); if(b) b.onclick=sendPick;
-}
-async function sendPick(){
-  const v=S.view; if(S.sel.c===null||S.sel.sent) return;
-  S.sel.sent=true; S.lastKey=""; render();
-  try{ await api("submit",S.code,S.pid,v.round,S.sel.c,S.sel.b); poll(true); }
-  catch(e){ S.sel.sent=false; S.lastKey=""; render(); toast(errMsg(e)); }
-}
-
-/* ---- 공개 ---- */
-function revealScreen(v){
-  const H=S.role==="host", last = v.round>=v.rounds_main-1;
-  let h=`<div class="topbar">${H?roundTag(v):meBar(v)}${H?"":roundTag(v)}</div>`;
-  if(!H){
-    const p=v.players.find(x=>x.id===v.me.id), pk=p.picks[v.round], d=p.deltas[v.round];
-    if(d===undefined) h+=`<div class="banner"><span class="na">서든데스 관전 중</span></div>`;
-    else if(!pk) h+=`<div class="banner"><span class="na">시간 초과! 0점</span></div>`;
-    else h+=`<div class="banner">${pk.ok?`<span class="ok">정답! ${v.sd?"+1":"+"+pk.b}</span>`:`<span class="no">땡! ${v.sd?"0":"−"+pk.b}</span>`}</div>`;
-  } else h+=`<div class="q center">판결 공개!</div>`;
-  h+=`<div class="pair" style="margin-top:10px">${card(v,0,{})}${card(v,1,{})}</div>`;
-  h+=board(v,{delta:true});
-  if(H){ h+=`<button class="btn block red" id="next">${last?"다음 (결과 / 서든데스)":"다음 사건"}</button>${script("reveal")}`; }
-  else h+=`<div class="sub center">진행자가 다음 사건을 열 때까지 기다려 주세요</div>`;
-  return h;
-}
-
-/* ---- 최종 결과 ---- */
-function finalScreen(v){
-  const H=S.role==="host";
-  const sm=id=>(v.summary||[]).find(s=>s.id===id)||{};
-  const list=v.players.slice().sort((a,b)=>(sm(a.id).rank||9)-(sm(b.id).rank||9));
-  let h=`<div class="topbar">${meBar(v)}<span class="tag red">수사 결과</span></div>`;
-  const wn=v.winners.map(id=>v.players.find(p=>p.id===id)).filter(Boolean);
-  h+=`<div class="center"><div style="font-size:54px">🏆</div><h2>오늘의 행운 수사관</h2>
-    <div style="font-family:'Black Han Sans';font-size:clamp(34px,8vw,60px)">${wn.map(p=>`<span style="color:${p.color}">${esc(p.name)}</span>`).join(" · ")}</div></div>`;
-  if(!H && v.me){ const s=sm(v.me.id); h+=`<div class="banner">${v.winners.includes(v.me.id)?`<span class="ok">우승! 부스 선생님께 상품을 받으세요</span>`:`<span class="na">나의 순위: ${s.rank}위</span>`}</div>`; }
-  h+=`<ul class="board">${list.map(p=>{ const s=sm(p.id);
-    return `<li class="${v.winners.includes(p.id)?"win":""}"><span class="rk">${s.rank}</span><span class="dot" style="background:${p.color}"></span>
-      <span>${esc(p.name)}<br><span class="sub2">맞힘 ${s.correct}/${v.rounds_main} · 무죄인 사람 지목 ${s.acq}번</span></span><span class="sc">${p.score}</span></li>`; }).join("")}</ul>`;
-  if(H) h+=`<button class="btn block red" id="secretBtn">비밀 공개 🔍</button>${script("final")}`;
-  else h+=`<div class="sub center">잠깐! 진행자가 비밀을 공개할 거예요…</div>`;
-  return h;
-}
-
-/* ---- 비밀 공개 + 마무리 ---- */
-function secretTexts(v){
-  const sm=v.summary||[];
-  const acq=sm.reduce((a,s)=>a+(s.acq||0),0), b3=sm.reduce((a,s)=>a+(s.b3||0),0), b3ok=sm.reduce((a,s)=>a+(s.b3ok||0),0);
-  const wn=v.winners.map(id=>(v.players.find(p=>p.id===id)||{}).name).filter(Boolean).map(esc).join(", ");
-  let t3 = acq>0
-    ? `여러분이 “더 무거운 형을 받았을 것”이라고 지목한 사람 중 <b>무죄였던 경우가 모두 ${acq}번</b>이에요. 얼굴만 보고 죄 없는 사람을 범죄자로 찍은 거죠.`
-    : `이번엔 피해 갔지만, 오늘 등장한 피고인 ${v.rounds_main*2}명 중 <b>3명은 무죄 판결</b>을 받은 사람이었어요. 얼굴로 판단했다면 누구든 범죄자로 찍힐 수 있었어요.`;
-  if(b3) t3 += ` 그리고 ‘100% 확신’(3점)을 건 선택 ${b3}번 중 맞힌 건 <b>${b3ok}번</b>뿐이었어요.`;
-  return [
-    `오늘 본 얼굴은 모두 <b>컴퓨터가 롬브로소 체크리스트대로 그린 가상 인물</b>이에요. 세상에 없는 사람들이죠.`,
-    `판결은 <b>얼굴과 아무 상관 없이 무작위로</b> 붙였어요. 그러니까 1등도 순전히 운! ${wn}님은 실력이 아니라 운으로 뽑힌 <b>‘오늘의 행운 수사관’</b>이에요 🍀`,
-    t3
-  ];
-}
-function secretScreen(v){
-  const H=S.role==="host", T=secretTexts(v), n = v.phase==="ending" ? 3 : v.secret;
-  let h=`<div class="topbar">${meBar(v)}<span class="tag red">비밀 공개</span></div>`;
-  for(let i=0;i<n;i++) h+=`<div class="secret"><div class="no">비밀 ${i+1}</div><p>${T[i]}</p></div>`;
-  if(v.phase==="ending"){
-    h+=`<div class="history"><b>롬브로소는 틀렸습니다.</b> 1913년 영국의 찰스 고링은 수형자 약 3,000명과 일반인의 얼굴과 몸을 비교했어요.
-      결과는 ‘범죄자형 얼굴’ 같은 건 없다는 것. 롬브로소의 이론은 지금은 대표적인 사이비 과학으로 꼽혀요.</div>
-    <div class="law"><div class="art">대한민국 헌법 제27조 제4항</div>
-      <blockquote>“형사피고인은 유죄의 판결이<br>확정될 때까지는 무죄로 추정된다.”</blockquote>
-      <p>이게 바로 <b>무죄추정의 원칙</b>이에요. 법정은 얼굴이 아니라 <b>증거</b>로 판단합니다.
-      생김새나 첫인상으로 “범인 같다”고 단정하는 순간, 무고한 사람이 범죄자가 될 수 있으니까요.</p></div>`;
-    if(H) h+=`<button class="btn block red" id="newGame">다음 판 시작 (같은 코드로 대기실 열기)</button>${script("ending")}`;
-    else h+=`<div class="wait">참여해 줘서 고마워요!${v.winners.includes(v.me.id)?"<br>🏆 부스 선생님께 상품을 받아 가세요!":""}</div>`;
-  } else if(H){
-    h+=`<button class="btn block red" id="secretBtn">${n<3?"비밀 하나 더 🔍":"마무리 화면으로"}</button>${script("secret")}`;
-  }
-  return h;
-}
-
-/* ---- 기타 화면 ---- */
-function outScreen(v){
-  return `<h1>관상 수사대</h1><div class="panel"><h2>이번 판에 참여하고 있지 않아요</h2>
-    <p class="sub">게임이 끝났거나 명단에서 빠졌어요. ${v.phase==="lobby"?"지금 대기실이 열려 있어요!":"진행 중인 판이 끝나면 다시 참여할 수 있어요."}</p>
-    <button class="btn block red" id="rejoin" ${v.phase==="lobby"?"":"disabled"}>${esc(S.name)} (${esc(S.sid)})로 다시 참여</button>
-    <button class="btn block ghost" id="leave">다른 학번으로 들어가기</button><div class="err" id="oerr"></div></div>`;
-}
-function bindOut(){
-  $("#rejoin").onclick=async()=>{ try{ const r=await api("join",S.code,S.sid,S.name); S.pid=r.pid; S.gameNo=r.gameNo; savePlayer(); S.lastKey=""; poll(true);}catch(e){ $("#oerr").textContent=errMsg(e);} };
-  $("#leave").onclick=()=>{ ls.del("lb_player"); location.href=APP_URL+"?code="+S.code; };
-}
-function goneScreen(){ return `<h1>관상 수사대</h1><div class="panel"><h2>참여 코드가 사라졌어요</h2><p class="sub">진행자에게 새 참여 코드를 물어보세요.</p><button class="btn block" id="goHome">처음으로</button></div>`; }
-function bindGone(){ $("#goHome").onclick=()=>{ ls.del("lb_player"); ls.del("lb_host"); location.href=APP_URL; }; }
-
-/* ---- 이벤트 연결 ---- */
-function bind(v){
-  const H=S.role==="host";
-  if(v.phase==="lobby" && H){
-    const qr=$("#qr");
-    if(qr && typeof QRCode!=="undefined") new QRCode(qr,{text:APP_URL+"?code="+v.code,width:200,height:200,colorDark:"#232220",colorLight:"#f7f4ee"});
-    $("#start").onclick=()=>hostAct("startGame");
-    $("#plist").onclick=async e=>{ const b=e.target.closest("[data-kick]"); if(!b) return;
-      try{ await api("kick",S.code,S.hostKey,b.dataset.kick); poll(true);}catch(err){toast(errMsg(err));} };
-    $("#logout").onclick=()=>{ ls.del("lb_host"); location.href=APP_URL; };
-  }
-  if(v.phase==="pick" && H) $("#forceReveal").onclick=()=>{ S.revealSent[v.gameNo+":"+v.round]=true; hostAct("reveal"); };
-  if(v.phase==="pick" && !H){
-    const pair=$("#pair");
-    if(pair) pair.onclick=e=>{ const c=e.target.closest(".card"); if(!c||S.sel.sent) return;
-      S.sel.c=+c.dataset.k; pair.querySelectorAll(".card").forEach(x=>x.classList.toggle("sel",+x.dataset.k===S.sel.c)); playerPickFoot(v); };
-    const bets=$("#bets");
-    if(bets) bets.onclick=e=>{ const b=e.target.closest(".bet"); if(!b||S.sel.sent) return;
-      S.sel.b=+b.dataset.b; bets.querySelectorAll(".bet").forEach(x=>x.classList.toggle("on",+x.dataset.b===S.sel.b)); playerPickFoot(v); };
-    playerPickFoot(v);
-  }
-  if(v.phase==="reveal" && H) $("#next").onclick=()=>hostAct("next");
-  const sb=$("#secretBtn"); if(sb) sb.onclick=()=>hostAct("secret");
-  const ng=$("#newGame"); if(ng) ng.onclick=()=>hostAct("newGame");
-}
-function update(v){
-  const H=S.role==="host";
-  if(v.phase==="lobby" && H) hostLobbyUpdate(v);
-  if(v.phase==="lobby" && !H){ const el=$("#pcount"); if(el) el.textContent=`지금 ${v.players.length}명 입장 (최대 ${v.maxPlayers}명)`; }
-  if(v.phase==="pick" && H) hostPickUpdate(v);
-  const ms=$("#myScore"); if(ms && v.me){ const p=v.players.find(x=>x.id===v.me.id); if(p) ms.textContent=p.score; }
-}
-
-/* ================= 입장 화면 ================= */
-function savePlayer(){ ls.set("lb_player",{code:S.code,pid:S.pid,sid:S.sid,name:S.name,gameNo:S.gameNo}); }
-function entry(){
-  document.body.classList.remove("host");
-  app.innerHTML=`<span class="tag">사건 기록실 · 1876</span>
-  <h1>관상 수사대<br><em>롬브로소의 몽타주</em></h1>
-  <p class="sub">얼굴만 보고 형량을 맞힐 수 있을까? 2~4명이 함께 겨루는 수사 게임</p>
-  <form class="panel" id="joinForm" autocomplete="off">
-    <label class="f" for="jc">참여 코드</label><input class="in code" id="jc" inputmode="numeric" maxlength="4" value="${esc(INIT_CODE)}" placeholder="0000">
-    <label class="f" for="js">학번</label><input class="in" id="js" inputmode="numeric" maxlength="8" placeholder="예: 10203">
-    <label class="f" for="jn">이름</label><input class="in" id="jn" maxlength="10" placeholder="이름">
-    <div class="err" id="jerr"></div>
-    <button class="btn block red" type="submit">수사본부 입장</button>
-  </form>
-  <div class="row"><span class="sub" style="font-size:12px">학번과 이름은 상품 지급 확인용으로만 기록돼요.</span><button class="linkbtn" id="toHost">진행자 화면</button></div>`;
-  $("#joinForm").onsubmit=async e=>{
-    e.preventDefault();
-    const code=$("#jc").value.trim(), sid=$("#js").value.trim(), name=$("#jn").value.trim();
-    if(!/^\d{4}$/.test(code)) return $("#jerr").textContent="참여 코드 4자리를 입력하세요.";
-    const btn=e.target.querySelector("button"); btn.disabled=true; $("#jerr").textContent="";
+async function encode(name, pledge){
+  const text = name + "\x1f" + pledge;
+  const cands = [["a", utf8(text)], ["b", utf16(text)]];
+  if (canZip){
     try{
-      const r=await api("join",code,sid,name);
-      Object.assign(S,{role:"player",code,sid,name,pid:r.pid,gameNo:r.gameNo}); savePlayer();
-      app.innerHTML=`<div class="wait">입장 중…</div>`; startPolling();
-    }catch(err){ $("#jerr").textContent=errMsg(err); btn.disabled=false; }
-  };
-  $("#toHost").onclick=hostLogin;
+      cands.push(["c", await streamBytes(utf8(text), CompressionStream, "deflate-raw")]);
+      cands.push(["d", await streamBytes(utf16(text), CompressionStream, "deflate-raw")]);
+    }catch(e){}
+  }
+  let best = null;
+  for (const [k, b] of cands){ const s = k + toB62(b); if (!best || s.length < best.length) best = s; }
+  return best;
 }
-function hostLogin(){
-  const saved=ls.get("lb_host");
-  app.innerHTML=`<span class="tag">진행자 전용</span><h1>진행자 <em>로그인</em></h1>
-  <div class="panel">
-    <label class="f" for="pin">진행자 비밀번호</label><input class="in" id="pin" type="password" inputmode="numeric">
-    <button class="btn block red" id="mk">새 참여 코드 만들기</button>
-    ${saved?`<button class="btn block" id="resume">진행 중인 방(코드 ${esc(saved.code)})으로 돌아가기</button>`:""}
-    <label class="f" for="rc" style="margin-top:18px">다른 기기에서 만든 코드로 이어서 진행</label>
-    <div class="row" style="flex-wrap:nowrap"><input class="in code" id="rc" maxlength="4" inputmode="numeric" placeholder="0000"><button class="btn" id="rcGo">열기</button></div>
-    <div class="err" id="herr"></div>
-  </div><button class="linkbtn" id="back">← 참가자 입장 화면</button>`;
-  const go=(code,hostKey)=>{ Object.assign(S,{role:"host",code,hostKey}); ls.set("lb_host",{code,hostKey}); app.innerHTML=`<div class="wait">불러오는 중…</div>`; startPolling(); };
-  $("#mk").onclick=async()=>{ try{ const r=await api("createRoom",$("#pin").value); go(r.code,r.hostKey);}catch(e){ $("#herr").textContent=errMsg(e);} };
-  if(saved) $("#resume").onclick=()=>go(saved.code,saved.hostKey);
-  $("#rcGo").onclick=async()=>{ try{ const r=await api("hostResume",$("#rc").value.trim(),$("#pin").value); go(r.code,r.hostKey);}catch(e){ $("#herr").textContent=errMsg(e);} };
-  $("#back").onclick=entry;
+async function decode(hash){
+  const k = hash[0], body = fromB62(hash.slice(1));
+  let text;
+  if (k === "a") text = new TextDecoder().decode(body);
+  else if (k === "b") text = unUtf16(body);
+  else if (k === "c") text = new TextDecoder().decode(await streamBytes(body, DecompressionStream, "deflate-raw"));
+  else if (k === "d") text = unUtf16(await streamBytes(body, DecompressionStream, "deflate-raw"));
+  else throw 0;
+  const i = text.indexOf("\x1f");
+  if (i < 0) throw 0;
+  return { name: text.slice(0, i), pledge: text.slice(i + 1) };
 }
 
-/* ================= 시작 ================= */
-const savedP=ls.get("lb_player");
-if(HOST_MODE){ hostLogin(); }
-else if(savedP && savedP.pid && (!INIT_CODE || INIT_CODE===savedP.code)){
-  Object.assign(S,{role:"player",code:savedP.code,pid:savedP.pid,sid:savedP.sid,name:savedP.name,gameNo:savedP.gameNo});
-  app.innerHTML=`<div class="wait">다시 연결하는 중…</div>`; startPolling();
-} else entry();
+/* NFC NDEF URI 레코드 크기 계산 (NTAG215 사용자 영역 504바이트 기준) */
+function ndefSize(url){
+  const prefixes = ["https://www.", "http://www.", "https://", "http://"];
+  let body = url;
+  for (const p of prefixes){ if (url.startsWith(p)){ body = url.slice(p.length); break; } }
+  const payload = 1 + utf8(body).length;            // URI 식별 코드 1바이트 + 나머지
+  const record = 1 + 1 + (payload < 256 ? 1 : 4) + 1 + payload; // 헤더·타입길이·페이로드길이·타입("U")
+  const tlv = 1 + (record < 255 ? 1 : 3) + record + 1;          // 0x03 TLV + 종료 0xFE
+  return tlv;
+}
+
+/* =========================================================
+   QR 코드 생성기 (바이트 모드, 오류정정 M) — 외부 라이브러리 없이
+   ========================================================= */
+const QR = (() => {
+  const ECC = { L:[-1,7,10,15,20,26,18,20,24,30,18,20,24,26,30,22,24,28,30,28,28,28,28,30,30,26,28,30,30,30,30,30,30,30,30,30,30,30,30,30,30],
+                M:[-1,10,16,26,18,24,16,18,22,22,26,30,22,22,24,24,28,28,26,26,26,26,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28] };
+  const BLK = { L:[-1,1,1,1,1,1,2,2,2,2,4,4,4,4,4,6,6,6,6,7,8,8,9,9,10,12,12,12,13,14,15,16,17,18,19,19,20,21,22,24,25],
+                M:[-1,1,1,1,2,2,4,4,4,5,5,5,8,9,9,10,10,11,13,14,16,17,17,18,20,21,23,25,26,28,29,31,33,35,37,38,40,43,45,47,49] };
+  const FMT = { L:1, M:0 };
+  const rawModules = v => { let r=(16*v+128)*v+64; if (v>=2){ const n=Math.floor(v/7)+2; r-=(25*n-10)*n-55; if (v>=7) r-=36; } return r; };
+  const dataCw = (v,e) => Math.floor(rawModules(v)/8) - ECC[e][v]*BLK[e][v];
+  const gmul = (x,y) => { let z=0; for (let i=7;i>=0;i--){ z=(z<<1)^((z>>>7)*0x11D); z^=((y>>>i)&1)*x; } return z; };
+  function rsDivisor(d){ const r=new Array(d-1).fill(0); r.push(1); let root=1;
+    for (let i=0;i<d;i++){ for (let j=0;j<r.length;j++){ r[j]=gmul(r[j],root); if (j+1<r.length) r[j]^=r[j+1]; } root=gmul(root,2); } return r; }
+  function rsRem(data,div){ const r=div.map(()=>0); for (const b of data){ const f=b^r.shift(); r.push(0); div.forEach((c,i)=>r[i]^=gmul(c,f)); } return r; }
+  function alignPos(v,size){ if (v===1) return []; const n=Math.floor(v/7)+2; const step=Math.floor((v*8+n*3+5)/(n*4-4))*2;
+    const r=[6]; for (let p=size-7; r.length<n; p-=step) r.splice(1,0,p); return r; }
+
+  function make(bytes, ecl="M"){
+    let ver=1, ccBits;
+    for (;;ver++){ if (ver>40) throw new Error("too long"); ccBits = ver<10?8:16; if (4+ccBits+8*bytes.length <= dataCw(ver,ecl)*8) break; }
+    const bits=[]; const put=(val,len)=>{ for (let i=len-1;i>=0;i--) bits.push((val>>>i)&1); };
+    put(4,4); put(bytes.length,ccBits); for (const b of bytes) put(b,8);
+    const cap=dataCw(ver,ecl)*8;
+    put(0, Math.min(4, cap-bits.length)); put(0, (8-bits.length%8)%8);
+    for (let p=0xEC; bits.length<cap; p^=0xEC^0x11) put(p,8);
+    const data=[]; for (let i=0;i<bits.length;i+=8){ let b=0; for (let j=0;j<8;j++) b=(b<<1)|bits[i+j]; data.push(b); }
+
+    // 오류정정 + 인터리브
+    const nb=BLK[ecl][ver], el=ECC[ecl][ver], raw=Math.floor(rawModules(ver)/8);
+    const nShort=nb-raw%nb, shortLen=Math.floor(raw/nb), div=rsDivisor(el), blocks=[];
+    for (let i=0,k=0;i<nb;i++){ const d=data.slice(k,k+shortLen-el+(i<nShort?0:1)); k+=d.length; const e=rsRem(d,div); if (i<nShort) d.push(0); blocks.push(d.concat(e)); }
+    const cw=[]; for (let i=0;i<blocks[0].length;i++) blocks.forEach((b,j)=>{ if (i!==shortLen-el || j>=nShort) cw.push(b[i]); });
+
+    const size=ver*4+17;
+    const M=[...Array(size)].map(()=>Array(size).fill(false));
+    const F=[...Array(size)].map(()=>Array(size).fill(false));
+    const set=(x,y,v)=>{ M[y][x]=v; F[y][x]=true; };
+    for (let i=0;i<size;i++){ set(6,i,i%2===0); set(i,6,i%2===0); }
+    for (const [cx,cy] of [[3,3],[size-4,3],[3,size-4]])
+      for (let dy=-4;dy<=4;dy++) for (let dx=-4;dx<=4;dx++){ const x=cx+dx,y=cy+dy; if (x>=0&&x<size&&y>=0&&y<size){ const d=Math.max(Math.abs(dx),Math.abs(dy)); set(x,y,d!==2&&d!==4); } }
+    const ap=alignPos(ver,size), na=ap.length;
+    for (let i=0;i<na;i++) for (let j=0;j<na;j++){ if ((i===0&&j===0)||(i===0&&j===na-1)||(i===na-1&&j===0)) continue;
+      for (let dy=-2;dy<=2;dy++) for (let dx=-2;dx<=2;dx++) set(ap[i]+dx,ap[j]+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1); }
+    const drawFormat=mask=>{ const d=FMT[ecl]<<3|mask; let r=d; for (let i=0;i<10;i++) r=(r<<1)^((r>>>9)*0x537);
+      const b=(d<<10|r)^0x5412, g=i=>((b>>>i)&1)!==0;
+      for (let i=0;i<=5;i++) set(8,i,g(i)); set(8,7,g(6)); set(8,8,g(7)); set(7,8,g(8));
+      for (let i=9;i<15;i++) set(14-i,8,g(i));
+      for (let i=0;i<8;i++) set(size-1-i,8,g(i));
+      for (let i=8;i<15;i++) set(8,size-15+i,g(i));
+      set(8,size-8,true); };
+    drawFormat(0);
+    if (ver>=7){ let r=ver; for (let i=0;i<12;i++) r=(r<<1)^((r>>>11)*0x1F25); const b=ver<<12|r;
+      for (let i=0;i<18;i++){ const v=((b>>>i)&1)!==0, a=size-11+i%3, c=Math.floor(i/3); set(a,c,v); set(c,a,v); } }
+
+    // 데이터 배치
+    let i=0;
+    for (let right=size-1; right>=1; right-=2){ if (right===6) right=5;
+      for (let vert=0;vert<size;vert++) for (let j=0;j<2;j++){ const x=right-j, up=((right+1)&2)===0, y=up?size-1-vert:vert;
+        if (!F[y][x] && i<cw.length*8){ M[y][x]=((cw[i>>>3]>>>(7-(i&7)))&1)!==0; i++; } } }
+
+    const maskFn=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,
+      (x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const applyMask=m=>{ for (let y=0;y<size;y++) for (let x=0;x<size;x++) if (!F[y][x]&&maskFn[m](x,y)) M[y][x]=!M[y][x]; };
+    const penalty=()=>{ let p=0, dark=0;
+      for (let a=0;a<size;a++){ let rr=1, rc=1;
+        for (let b=1;b<size;b++){
+          if (M[a][b]===M[a][b-1]) rr++; else { if (rr>=5) p+=rr-2; rr=1; }
+          if (M[b][a]===M[b-1][a]) rc++; else { if (rc>=5) p+=rc-2; rc=1; } }
+        if (rr>=5) p+=rr-2; if (rc>=5) p+=rc-2; }
+      for (let y=0;y<size-1;y++) for (let x=0;x<size-1;x++){ const c=M[y][x]; if (c===M[y][x+1]&&c===M[y+1][x]&&c===M[y+1][x+1]) p+=3; }
+      for (const row of M) for (const c of row) if (c) dark++;
+      p += Math.floor(Math.abs(dark*20 - size*size*10) / (size*size)) * 10;
+      return p; };
+    let best=0, bestP=Infinity;
+    for (let m=0;m<8;m++){ applyMask(m); drawFormat(m); const p=penalty(); if (p<bestP){ bestP=p; best=m; } applyMask(m); }
+    applyMask(best); drawFormat(best);
+    return M;
+  }
+  return { make };
 })();
+
+function drawQR(canvas, text){
+  const M = QR.make(utf8(text), "M"), n = M.length, q = 4, total = n + q*2;
+  const scale = Math.max(2, Math.floor(600 / total));
+  canvas.width = canvas.height = total * scale;
+  const c = canvas.getContext("2d");
+  c.fillStyle = "#fff"; c.fillRect(0,0,canvas.width,canvas.height);
+  c.fillStyle = "#1d1d1f";
+  for (let y=0;y<n;y++) for (let x=0;x<n;x++) if (M[y][x]) c.fillRect((x+q)*scale,(y+q)*scale,scale,scale);
+}
+
+/* =========================================================
+   화면 제어
+   ========================================================= */
+const $ = id => document.getElementById(id);
+let currentUrl = "";
+
+function getBase(){
+  let b = ($("base").value || "").trim();
+  if (!b) b = DEFAULT_BASE.startsWith("http") ? DEFAULT_BASE : location.href;
+  return b.split("#")[0];
+}
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),1600); }
+
+let seq = 0;
+async function update(){
+  const name = $("name").value.trim(), pledge = $("pledge").value.trim();
+  $("cnt").textContent = $("pledge").value.length;
+  const my = ++seq;
+  if (!name || !pledge){ $("empty").classList.remove("hidden"); $("out").classList.add("hidden"); return; }
+  const code = await encode(name, pledge);
+  if (my !== seq) return;
+  currentUrl = getBase() + "#" + code;
+  const bytes = utf8(currentUrl).length, nd = ndefSize(currentUrl), ok = nd <= NTAG215_USER_BYTES;
+  $("empty").classList.add("hidden"); $("out").classList.remove("hidden");
+  $("link").textContent = currentUrl;
+  $("bytes").textContent = bytes;
+  $("ndef").textContent = nd;
+  $("bar").classList.toggle("over", !ok);
+  $("bar").firstElementChild.style.width = Math.min(100, nd / NTAG215_USER_BYTES * 100) + "%";
+  const fit = $("fit");
+  fit.className = "fit " + (ok ? "ok" : "bad");
+  fit.textContent = ok ? `✅ NTAG215(약 500바이트)에 들어가요 · ${NTAG215_USER_BYTES - nd}바이트 남음`
+                       : `❌ NTAG215(약 500바이트)에 안 들어가요 · ${nd - NTAG215_USER_BYTES}바이트 초과`;
+  $("preview").href = "#" + code;
+  try { drawQR($("qr"), currentUrl); } catch(e) {}
+}
+
+async function copyLink(){
+  if (!currentUrl) return;
+  try { await navigator.clipboard.writeText(currentUrl); toast("링크를 복사했어요"); return; } catch(e) {}
+  try {
+    const ta = document.createElement("textarea"); ta.value = currentUrl; ta.setAttribute("readonly","");
+    ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy"); ta.remove();
+    if (ok){ toast("링크를 복사했어요"); return; }
+  } catch(e) {}
+  const r = document.createRange(); r.selectNodeContents($("link"));
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  toast("링크를 선택했어요. 길게 눌러 복사하세요");
+}
+
+function show(id){ ["maker","view","bad"].forEach(k => $(k).classList.toggle("hidden", k !== id)); window.scrollTo(0,0); }
+
+async function route(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h){ show("maker"); return; }
+  try {
+    const { name, pledge } = await decode(h);
+    $("vName").textContent = name;
+    $("vPledge").textContent = pledge;
+    const len = pledge.length;
+    $("vPledge").className = "pledge" + (len > 70 ? " xsmall" : len > 40 ? " small" : "");
+    document.title = `${name}의 2027 다짐`;
+    const card = $("card"); card.style.animation = "none"; void card.offsetWidth; card.style.animation = "";
+    show("view");
+  } catch(e){ show("bad"); }
+}
+
+/* 초기화 */
+try { const saved = localStorage.getItem("pledge-base"); if (saved) $("base").value = saved; } catch(e) {}
+if (!$("base").value) $("base").value = getBase();
+$("base").addEventListener("input", () => { try { localStorage.setItem("pledge-base", $("base").value.trim()); } catch(e) {} update(); });
+$("name").addEventListener("input", update);
+$("pledge").addEventListener("input", update);
+$("copy").addEventListener("click", copyLink);
+$("makeMine").addEventListener("click", e => { e.preventDefault(); history.replaceState(null, "", location.pathname + location.search); document.title="NFC 키링 다짐 카드"; route(); });
+document.querySelectorAll('#bad a').forEach(a => a.addEventListener("click", e => { e.preventDefault(); history.replaceState(null,"",location.pathname+location.search); route(); }));
+window.addEventListener("hashchange", route);
+route();
 </script>
 </body>
 </html>
